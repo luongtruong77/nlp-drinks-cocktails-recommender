@@ -45,7 +45,7 @@ topics_by_description_df = full_df.merge(topics_by_description_df, on='Descripti
 ########################################
 
 
-st.image(Image.open('../figures/cocktails.jpg'))
+
 
 st.markdown("<h1 style='text-align: center; color: black;'>Your personal drinks recommendation system!</h1>",
             unsafe_allow_html=True)
