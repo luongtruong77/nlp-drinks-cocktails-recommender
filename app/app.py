@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import pickle
+from PIL import Image
 
 pd.set_option('display.max_columns', None)
 from sklearn.metrics.pairwise import cosine_similarity
@@ -43,6 +44,8 @@ topics_by_description_df = full_df.merge(topics_by_description_df, on='Descripti
 
 ########################################
 
+
+st.image(Image.open('../figures/cocktails.jpg'))
 
 st.markdown("<h1 style='text-align: center; color: black;'>Your personal drinks recommendation system!</h1>",
             unsafe_allow_html=True)
