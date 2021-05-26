@@ -1,28 +1,10 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import re
 import pickle
-import matplotlib.pyplot as plt
 pd.set_option('display.max_columns', None)
-from sklearn.decomposition import NMF
-from sklearn.metrics.pairwise import cosine_similarity, manhattan_distances, euclidean_distances
-from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
-from sklearn.decomposition import NMF, TruncatedSVD, LatentDirichletAllocation
+from sklearn.metrics.pairwise import cosine_similarity
 from nltk.metrics import edit_distance
 
-import glob
-from IPython.display import Image
-from IPython.core.display import HTML
-from PIL import Image
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.stem.lancaster import LancasterStemmer
-from nltk.stem.snowball import SnowballStemmer
-from nltk.tokenize import RegexpTokenizer
-from nltk.stem import WordNetLemmatizer
-from time import time
-import random
 
 with open('pkls/full_df.pkl', 'rb') as rf:
     full_df = pickle.load(rf)
@@ -44,6 +26,16 @@ with open('pkls/nmf_tasting.pkl', 'rb') as rf:
     nmf_tas = pickle.load(rf)
 with open('pkls/cocktails_with_photos.pkl', 'rb') as rf:
     cocktails_with_photos = pickle.load(rf)
+with open('pkls/ingredients_df.pkl', 'rb') as rf:
+    ingredients_df = pickle.load(rf)
+with open('pkls/nmf_ingredients.pkl', 'rb') as rf:
+    nmf_ingredients = pickle.load(rf)
+with open('pkls/ingredients_matrix.pkl', 'rb') as rf:
+    ingredients_matrix = pickle.load(rf)
+with open('pkls/tfidf_ingredients.pkl', 'rb') as rf:
+    tfidf_ingredients = pickle.load(rf)
+
+
 
 
 topics_by_tasting_df = full_df.merge(topics_by_tasting_df, on='Name')
@@ -52,17 +44,16 @@ topics_by_description_df = full_df.merge(topics_by_description_df, on='Descripti
 
 ########################################
 
-with open("style.css") as f:
-    st.markdown('<style>{}</style>'.format(f.read()), unsafe_allow_html=True)
 
-
-st.markdown("<h1 style='text-align: center; color: black;'>Your personal drinks recommendation system!</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: black;'>Your personal drinks recommendation system!</h1>",
+            unsafe_allow_html=True)
 st.write('---')
 
 ########################################
 
 options = st.sidebar.selectbox('Please choose one of the options on how to search for your drinks.',
-                       ('Please drink responsibly', 'Recommend by Description', 'Recommend By Tasting Info', 'Cocktails Recommendation'))
+                       ('Please drink responsibly', 'Recommend by Description', 'Recommend By Tasting Info',
+                        'Cocktails Recommendation'))
 
 
 if options == 'Please drink responsibly':
@@ -191,7 +182,7 @@ elif options == 'Cocktails Recommendation':
 
         cocktails_with_photos['Distance'] = pd.DataFrame(distances, columns={'Distance'}).Distance
 
-        top_items = cocktails_with_photos.sort_values(by='Distance').head(8).fillna('N/A')
+        top_items = cocktails_with_photos.sort_values(by='Distance').head(10).fillna('N/A')
 
         st.write('**The top results:**')
         st.write('\n')
@@ -211,7 +202,7 @@ elif options == 'Cocktails Recommendation':
         my_expander = st.beta_expander('Show more recommendations')
 
         with my_expander:
-            for i in range(3,8):
+            for i in range(3,10):
 
                 st.write(
                     '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
@@ -226,11 +217,47 @@ elif options == 'Cocktails Recommendation':
                 st.write('---')
 
 
+    elif cocktails_options == 'By Ingredients':
 
+        user_input = st.text_input("what are your favorite ingredients? (gin, vodka, rum, etc.)")
 
+        topic_prob_dist = nmf_ingredients.transform(tfidf_ingredients.transform([user_input]))
 
+        list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, ingredients_matrix).argsort())[0][-1:-21:-1]
 
+        top_items = cocktails_with_photos.iloc[list_top_items_by_indices].sample(10)
 
+        st.write('**The top results:**')
+        st.write('\n')
+
+        for i in range(3):
+
+            st.write('**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                     .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients, top_items.iloc[i].Instructions,
+                             top_items.iloc[i].Serve_In))
+            try:
+                st.image(top_items.iloc[i].Photo_Link, width=250)
+            except:
+                st.write('Image is not available!')
+
+            st.write('---')
+
+        my_expander = st.beta_expander('Show more recommendations')
+
+        with my_expander:
+            for i in range(3,10):
+
+                st.write(
+                    '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                    .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
+                            top_items.iloc[i].Instructions,
+                            top_items.iloc[i].Serve_In))
+                try:
+                    st.image(top_items.iloc[i].Photo_Link, width=250)
+                except:
+                    st.write('Image is not available!')
+
+                st.write('---')
 
 
 
