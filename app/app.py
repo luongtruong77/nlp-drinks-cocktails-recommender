@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 import pickle
+
 pd.set_option('display.max_columns', None)
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.metrics import edit_distance
-
 
 with open('pkls/extended_df.pkl', 'rb') as rf:
     full_df = pickle.load(rf)
@@ -37,8 +37,6 @@ with open('pkls/tfidf_ingredients.pkl', 'rb') as rf:
 full_df.fillna('N/A', inplace=True)
 cocktails_with_photos.fillna('N/A', inplace=True)
 
-
-
 topics_by_tasting_df = full_df.merge(topics_by_tasting_df, on='Name')
 
 topics_by_description_df = full_df.merge(topics_by_description_df, on='Description')
@@ -53,119 +51,124 @@ st.write('---')
 ########################################
 
 
-
 options = st.sidebar.selectbox('Please choose one of the options on how to search for your drinks.',
-                       ('Please drink responsibly', 'Recommend by Description', 'Recommend By Tasting Info',
-                        'Cocktails Recommendation'))
-
+                               ('Please drink responsibly', 'Spirits, Wine, and Beer Recommendation',
+                                'Cocktails Recommendation'))
 
 if options == 'Please drink responsibly':
     st.write("Please don't drink and drive!")
 
-elif options == 'Recommend by Description':
+elif options == 'Spirits, Wine, and Beer Recommendation':
 
-    st.write('What would you like to drink today?')
-    user_input = st.text_input("Anything that you would like to describe your drink (cheap scotch, sweet wine, ipa, etc.)")
+    choices = st.radio('Please choose how you want to be recommended by', ('By Description', 'By Tasting Info'))
 
-    if user_input == '':
-        st.write('Please drink responsibly!')
-    else:
+    if choices == 'By Description':
 
-        topic_prob_dist = nmf_des.transform(tfidf_des.transform([user_input]))
+        nmf = nmf_des
+        tfidf = tfidf_des
+        topics_matrix = topics_by_description_matrix
+        topics_df = topics_by_description_df
 
-        list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_by_description_matrix).argsort())[0][-1:-31:-1]
+        st.write('What would you like to drink today?')
+        user_input = st.text_input(
+            "Anything that you would like to describe your drink (cheap scotch, sweet wine, ipa, etc.)")
 
-        top_10_random_items = topics_by_description_df.iloc[list_top_items_by_indices].sample(10)
+        if user_input == '':
+            st.write('Please drink responsibly!')
+        else:
 
-        top_items = top_10_random_items[:3]
+            topic_prob_dist = nmf.transform(tfidf.transform([user_input]))
 
-        next_items = top_10_random_items[3:]
+            list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_matrix).argsort())[0][
+                                        -1:-31:-1]
 
-        st.write('**The top results:**')
-        st.write('\n')
-        for i in range(len(top_items)):
-            st.write('**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
-                     '**Price:** ${}\n\n**Comments:** {}\n\n*{}*'.
-                     format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
-                            top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
-                            top_items.iloc[i].Bottom_Line, top_items.iloc[i].Review))
-            try:
-                st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
-            except:
-                st.image(top_items.iloc[i].Photo_Link_2, width=200)
-
-            st.write('---')
-
-        my_expander = st.beta_expander('Show more recommendations')
+            top_items = topics_df.iloc[list_top_items_by_indices].sample(10)
 
 
-        with my_expander:
-            for i in range(len(next_items)):
+            st.write('**The top results:**')
+            st.write('\n')
+            for i in range(3):
                 st.write('**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
                          '**Price:** ${}\n\n**Comments:** {}\n\n*{}*'.
-                         format(next_items.iloc[i].Name, next_items.iloc[i].Country, next_items.iloc[i].Alcohol_Vol,
-                                next_items.iloc[i].Aroma, next_items.iloc[i].Flavor, next_items.iloc[i].Price,
-                                next_items.iloc[i].Bottom_Line, next_items.iloc[i].Review))
+                         format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
+                                top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
+                                top_items.iloc[i].Bottom_Line, top_items.iloc[i].Review))
                 try:
-                    st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=200)
+                    st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
                 except:
-                    st.image(next_items.iloc[i].Photo_Link_2, width=200)
+                    st.image(top_items.iloc[i].Photo_Link_2, width=200)
 
                 st.write('---')
 
+            my_expander = st.beta_expander('Show more recommendations')
 
-elif options == 'Recommend By Tasting Info':
+            with my_expander:
+                for i in range(3, 10):
+                    st.write(
+                        '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
+                        '**Price:** ${}\n\n**Comments:** {}\n\n*{}*'.
+                            format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
+                                   top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
+                                   top_items.iloc[i].Bottom_Line, top_items.iloc[i].Review))
+                    try:
+                        st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
+                    except:
+                        st.image(top_items.iloc[i].Photo_Link_2, width=200)
 
-    st.write('What kind of food are your pairing with?')
-    user_input = st.text_input("Anything that you would like to describe your food (steak, chicken, grilled, etc.)")
+                    st.write('---')
 
-    if user_input == '':
-        st.write('Please drink responsibly!')
+    elif choices == 'By Tasting Info':
 
-    else:
+        st.write('What kind of food are your pairing with?')
+        user_input = st.text_input("Anything that you would like to describe your food (steak, chicken, grilled, etc.)")
 
-        topic_prob_dist = nmf_tas.transform(tfidf_tas.transform([user_input]))
+        if user_input == '':
+            st.write('Please drink responsibly!')
 
-        list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_by_tasting_matrix).argsort())[0][
-                                    -1:-21:-1]
+        else:
 
-        top_10_random_items = topics_by_tasting_df.iloc[list_top_items_by_indices].sample(10)
+            topic_prob_dist = nmf_tas.transform(tfidf_tas.transform([user_input]))
 
-        top_items = top_10_random_items[:3]
+            list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_by_tasting_matrix).argsort())[0][
+                                        -1:-21:-1]
 
-        next_items = top_10_random_items[3:8]
+            top_10_random_items = topics_by_tasting_df.iloc[list_top_items_by_indices].sample(10)
 
-        st.write('**The top results:**')
-        st.write('\n')
+            top_items = top_10_random_items[:3]
 
-        for i in range(len(top_items)):
-            st.write('**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
-                         '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\n*{}*'.
-                     format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
-                            top_items.iloc[i].Style, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
-                            top_items.iloc[i].Enjoy, top_items.iloc[i].Pairing, top_items.iloc[i].Review))
-            try:
-                st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=150)
-            except:
-                st.write('Image is not available!')
-            st.write('---')
+            next_items = top_10_random_items[3:8]
 
-        my_expander = st.beta_expander('Show more recommendations')
+            st.write('**The top results:**')
+            st.write('\n')
 
-
-        with my_expander:
-            for i in range(len(next_items)):
+            for i in range(len(top_items)):
                 st.write('**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
                          '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\n*{}*'.
-                         format(next_items.iloc[i].Name, next_items.iloc[i].Country, next_items.iloc[i].Alcohol_Vol,
-                                next_items.iloc[i].Style, next_items.iloc[i].Flavor, next_items.iloc[i].Price,
-                                next_items.iloc[i].Enjoy, next_items.iloc[i].Pairing, next_items.iloc[i].Review))
+                         format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
+                                top_items.iloc[i].Style, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
+                                top_items.iloc[i].Enjoy, top_items.iloc[i].Pairing, top_items.iloc[i].Review))
                 try:
-                    st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=150)
+                    st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=150)
                 except:
                     st.write('Image is not available!')
-
                 st.write('---')
+
+            my_expander = st.beta_expander('Show more recommendations')
+
+            with my_expander:
+                for i in range(len(next_items)):
+                    st.write(
+                        '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
+                        '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\n*{}*'.
+                            format(next_items.iloc[i].Name, next_items.iloc[i].Country, next_items.iloc[i].Alcohol_Vol,
+                                   next_items.iloc[i].Style, next_items.iloc[i].Flavor, next_items.iloc[i].Price,
+                                   next_items.iloc[i].Enjoy, next_items.iloc[i].Pairing, next_items.iloc[i].Review))
+                    try:
+                        st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=150)
+                    except:
+                        st.write('Image is not available!')
+
+                    st.write('---')
 
 elif options == 'Cocktails Recommendation':
 
@@ -193,9 +196,11 @@ elif options == 'Cocktails Recommendation':
 
         for i in range(3):
 
-            st.write('**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                     .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients, top_items.iloc[i].Instructions,
-                             top_items.iloc[i].Serve_In))
+            st.write(
+                '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                    .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
+                            top_items.iloc[i].Instructions,
+                            top_items.iloc[i].Serve_In))
             try:
                 st.image(top_items.iloc[i].Photo_Link, width=250)
             except:
@@ -206,13 +211,13 @@ elif options == 'Cocktails Recommendation':
         my_expander = st.beta_expander('Show more recommendations')
 
         with my_expander:
-            for i in range(3,10):
+            for i in range(3, 10):
 
                 st.write(
                     '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                    .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
-                            top_items.iloc[i].Instructions,
-                            top_items.iloc[i].Serve_In))
+                        .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
+                                top_items.iloc[i].Instructions,
+                                top_items.iloc[i].Serve_In))
                 try:
                     st.image(top_items.iloc[i].Photo_Link, width=250)
                 except:
@@ -236,9 +241,11 @@ elif options == 'Cocktails Recommendation':
 
         for i in range(3):
 
-            st.write('**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                     .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients, top_items.iloc[i].Instructions,
-                             top_items.iloc[i].Serve_In))
+            st.write(
+                '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                    .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
+                            top_items.iloc[i].Instructions,
+                            top_items.iloc[i].Serve_In))
             try:
                 st.image(top_items.iloc[i].Photo_Link, width=250)
             except:
@@ -249,28 +256,16 @@ elif options == 'Cocktails Recommendation':
         my_expander = st.beta_expander('Show more recommendations')
 
         with my_expander:
-            for i in range(3,10):
+            for i in range(3, 10):
 
                 st.write(
                     '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                    .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
-                            top_items.iloc[i].Instructions,
-                            top_items.iloc[i].Serve_In))
+                        .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
+                                top_items.iloc[i].Instructions,
+                                top_items.iloc[i].Serve_In))
                 try:
                     st.image(top_items.iloc[i].Photo_Link, width=250)
                 except:
                     st.write('Image is not available!')
 
                 st.write('---')
-
-
-
-
-
-
-
-
-
-
-
-
