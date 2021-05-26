@@ -178,40 +178,28 @@ elif options == 'Cocktails Recommendation':
 
         user_input = st.text_input("case insensitive (gin and tonic, old-fashioned, etc.)")
 
-        n = len(user_input)
+        if user_input == '':
+            st.write('Cheers!')
 
-        distances = []
+        else:
 
-        for i in range(len(cocktails_with_photos)):
-            dist = edit_distance(user_input.lower(), cocktails_with_photos.Name.iloc[i].strip().lower()[:n])
+            n = len(user_input)
 
-            distances.append(dist)
+            distances = []
 
-        cocktails_with_photos['Distance'] = pd.DataFrame(distances, columns={'Distance'}).Distance
+            for i in range(len(cocktails_with_photos)):
+                dist = edit_distance(user_input.lower(), cocktails_with_photos.Name.iloc[i].strip().lower()[:n])
 
-        top_items = cocktails_with_photos.sort_values(by='Distance').head(10).fillna('N/A')
+                distances.append(dist)
 
-        st.write('**The top results:**')
-        st.write('\n')
+            cocktails_with_photos['Distance'] = pd.DataFrame(distances, columns={'Distance'}).Distance
 
-        for i in range(3):
+            top_items = cocktails_with_photos.sort_values(by='Distance').head(10).fillna('N/A')
 
-            st.write(
-                '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                    .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
-                            top_items.iloc[i].Instructions,
-                            top_items.iloc[i].Serve_In))
-            try:
-                st.image(top_items.iloc[i].Photo_Link, width=250)
-            except:
-                st.write('Image is not available!')
+            st.write('**The top results:**')
+            st.write('\n')
 
-            st.write('---')
-
-        my_expander = st.beta_expander('Show more recommendations')
-
-        with my_expander:
-            for i in range(3, 10):
+            for i in range(3):
 
                 st.write(
                     '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
@@ -224,39 +212,44 @@ elif options == 'Cocktails Recommendation':
                     st.write('Image is not available!')
 
                 st.write('---')
+
+            my_expander = st.beta_expander('Show more recommendations')
+
+            with my_expander:
+                for i in range(3, 10):
+
+                    st.write(
+                        '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                            .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
+                                    top_items.iloc[i].Instructions,
+                                    top_items.iloc[i].Serve_In))
+                    try:
+                        st.image(top_items.iloc[i].Photo_Link, width=250)
+                    except:
+                        st.write('Image is not available!')
+
+                    st.write('---')
 
 
     elif cocktails_options == 'By Ingredients':
 
         user_input = st.text_input("what are your favorite ingredients? (gin, vodka, rum, etc.)")
 
-        topic_prob_dist = nmf_ingredients.transform(tfidf_ingredients.transform([user_input]))
+        if user_input == '':
+            st.write('Cheers!')
 
-        list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, ingredients_matrix).argsort())[0][-1:-21:-1]
+        else:
 
-        top_items = cocktails_with_photos.iloc[list_top_items_by_indices].sample(10)
+            topic_prob_dist = nmf_ingredients.transform(tfidf_ingredients.transform([user_input]))
 
-        st.write('**The top results:**')
-        st.write('\n')
+            list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, ingredients_matrix).argsort())[0][-1:-21:-1]
 
-        for i in range(3):
+            top_items = cocktails_with_photos.iloc[list_top_items_by_indices].sample(10)
 
-            st.write(
-                '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                    .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
-                            top_items.iloc[i].Instructions,
-                            top_items.iloc[i].Serve_In))
-            try:
-                st.image(top_items.iloc[i].Photo_Link, width=250)
-            except:
-                st.write('Image is not available!')
+            st.write('**The top results:**')
+            st.write('\n')
 
-            st.write('---')
-
-        my_expander = st.beta_expander('Show more recommendations')
-
-        with my_expander:
-            for i in range(3, 10):
+            for i in range(3):
 
                 st.write(
                     '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
@@ -269,3 +262,20 @@ elif options == 'Cocktails Recommendation':
                     st.write('Image is not available!')
 
                 st.write('---')
+
+            my_expander = st.beta_expander('Show more recommendations')
+
+            with my_expander:
+                for i in range(3, 10):
+
+                    st.write(
+                        '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                            .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
+                                    top_items.iloc[i].Instructions,
+                                    top_items.iloc[i].Serve_In))
+                    try:
+                        st.image(top_items.iloc[i].Photo_Link, width=250)
+                    except:
+                        st.write('Image is not available!')
+
+                    st.write('---')
