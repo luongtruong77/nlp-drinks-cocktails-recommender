@@ -6,7 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nltk.metrics import edit_distance
 
 
-with open('pkls/full_df.pkl', 'rb') as rf:
+with open('pkls/extended_df.pkl', 'rb') as rf:
     full_df = pickle.load(rf)
 with open('pkls/topics_by_description.pkl', 'rb') as rf:
     topics_by_description_df = pickle.load(rf)
@@ -34,7 +34,8 @@ with open('pkls/ingredients_matrix.pkl', 'rb') as rf:
     ingredients_matrix = pickle.load(rf)
 with open('pkls/tfidf_ingredients.pkl', 'rb') as rf:
     tfidf_ingredients = pickle.load(rf)
-
+full_df.fillna('N/A', inplace=True)
+cocktails_with_photos.fillna('N/A', inplace=True)
 
 
 
@@ -50,6 +51,8 @@ st.markdown("<h1 style='text-align: center; color: black;'>Your personal drinks 
 st.write('---')
 
 ########################################
+
+
 
 options = st.sidebar.selectbox('Please choose one of the options on how to search for your drinks.',
                        ('Please drink responsibly', 'Recommend by Description', 'Recommend By Tasting Info',
@@ -70,13 +73,13 @@ elif options == 'Recommend by Description':
 
         topic_prob_dist = nmf_des.transform(tfidf_des.transform([user_input]))
 
-        list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_by_description_matrix).argsort())[0][-1:-21:-1]
+        list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_by_description_matrix).argsort())[0][-1:-31:-1]
 
         top_10_random_items = topics_by_description_df.iloc[list_top_items_by_indices].sample(10)
 
         top_items = top_10_random_items[:3]
 
-        next_items = top_10_random_items[3:8]
+        next_items = top_10_random_items[3:]
 
         st.write('**The top results:**')
         st.write('\n')
@@ -87,9 +90,10 @@ elif options == 'Recommend by Description':
                             top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
                             top_items.iloc[i].Bottom_Line, top_items.iloc[i].Review))
             try:
-                st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=150)
+                st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
             except:
-                st.write('Image is not available!')
+                st.image(top_items.iloc[i].Photo_Link_2, width=200)
+
             st.write('---')
 
         my_expander = st.beta_expander('Show more recommendations')
@@ -103,9 +107,9 @@ elif options == 'Recommend by Description':
                                 next_items.iloc[i].Aroma, next_items.iloc[i].Flavor, next_items.iloc[i].Price,
                                 next_items.iloc[i].Bottom_Line, next_items.iloc[i].Review))
                 try:
-                    st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=150)
+                    st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=200)
                 except:
-                    st.write('Image is not available!')
+                    st.image(next_items.iloc[i].Photo_Link_2, width=200)
 
                 st.write('---')
 
