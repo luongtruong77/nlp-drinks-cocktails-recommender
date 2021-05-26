@@ -5,6 +5,9 @@
 Steven L Truong
 
 ---
+
+The recommender system can be accessed [HERE](https://share.streamlit.io/luongtruong77/nlp-drinks-cocktails-recommender/main/app/app.py)
+
 #### Choosing our favorite drink is (almost always) not easy!
 - We all have different opinions and choices when choosing our favorite alcoholic drinks. How do we pick the right one out of (possibly) over **10,000** types of drinks.
 - Let's say we all come to the bar to enjoy our weekends but we don't know what to order and the bartenders are too busy to recommend personalized drinks for each one of us. How do we know what we want?
