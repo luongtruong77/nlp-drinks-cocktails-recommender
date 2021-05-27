@@ -6,43 +6,70 @@ Steven L Truong
 
 ---
 
-The recommender system can be accessed [HERE](https://share.streamlit.io/luongtruong77/nlp-drinks-cocktails-recommender/main/app/app.py)
+## Abstract
+---
+In this project, I will use Natural Language Processing (NLP) with the data was acquired from multiple sources to build a system to recommend spirits, wine, beer, and cocktails to users based on their text inputs. The reviews, descriptions, and tasting information (wine and spirits), as well as ingredients (cocktails) were encoded using *Term Frequency–Inverse Document Frequency (TF-IDF)* and used to build *Non-negative Matrix Factorization (NMF)* topic modeling. Upon the topics extracted from the model, the cosine similarity metric is used to compare users input information and return the most relevant products.
+The **recommender system** can be accessed [HERE](https://share.streamlit.io/luongtruong77/nlp-drinks-cocktails-recommender/main/app/app.py)
+**PLEASE don't drink and drive!**
 
-#### Choosing our favorite drink is (almost always) not easy!
-- We all have different opinions and choices when choosing our favorite alcoholic drinks. How do we pick the right one out of (possibly) over **10,000** types of drinks.
+## Design
+---
+- Choosing our favorite drink is (almost always) not easy!
+- We all have different opinions and choices when choosing our favorite alcoholic drinks. How do we pick the right one out of (possibly) over 10,000 types of drinks.
 - Let's say we all come to the bar to enjoy our weekends but we don't know what to order and the bartenders are too busy to recommend personalized drinks for each one of us. How do we know what we want?
 - Would it be nice if we have an app (or just web brower interface) to help us choose our suitable drink based on our preference?
+- **YES!** In this project, I will answer those questions with the solution for all of us who have the same questions above.
+- Possible impacts:
+    - Business owners keep their customers (they will come back if they enjoy their drinks).
+    - End-users will be very happy when they know what to order (good drinks).
+    - Modern way to run bars and pubs.
 
-#### What is this project about?
-- [Ba Bar Lounge - Seattle](https://babarseattle.com/cold-drink/) is a Vietnamese restaurant that serves street food and cold drinks, and they want to improve their customers' experience by recommending them their favorite drinks.
-- In this project, I will build the recommender system to help users personalize their drinks based on their input information (such as **flavor** or **sweetness**).
-- This project will potentially help the bussiness keep customers (they will come back if they enjoy their drinks) and the users will be happy when they are not struggling on deciding which drink they should order.
+## Data
+---
+There are multiple data sources:
+- I scraped from [Tastings.com](https://www.tastings.com/Reviews/Latest-Spirits-Wine-Beer-Reviews.aspx) and [Caskers](https://www.caskers.com/spirits/). These sites are mainly for wine, spirits, and beer.
+- I scraped from [Liquor](https://www.liquor.com/cocktail-by-spirit-4779438) and calling API from [CocktailDB](https://www.thecocktaildb.com/) for cocktails ingredients.
+- The final ready-to-work-with dataset has around *12,000* instances and *24* features with 5 text-heavy features to work with (descriptions, reviews, tasting info, ingredients, and instructions).
 
-#### Task:
-The task is to do sentiment analysis with text review and build recommender system.
+## Algorithsm
+---
+#### Data cleaning and features engineering
+- Tokenize words, remove numbers and punctuations.
+- Add more case-specific stop words to stop-words corpus.
+- Combine short review and extended review into 1 feature Full_Review for exploring.
 
-#### Data:
-- Over **10,000** data points are scraped from [tastings.com](https://www.tastings.com/Home.aspx) containing each drink's attributes (description, flavor, pairing, price, etc) and their reviews from critics. 
-- Over **600** more data points are acquired using [TheCocktailDB API](https://www.thecocktaildb.com/api.php) containing photos and ingredients.
+#### Recommendation System
+- MDS, Isomap, t-SNE, LLE, PCA for clustering.
+>2-D t-SNE mapping
 
-#### Algorithms:
-I am planing to use:
-- Topic Modeling (Latent Dirichlet Allocation - LDA)
-- Latent Semantic Analysis (LSA)
-- Non-Negative Matrix Factorization (NMF)
+![](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender/blob/main/figures/tSNE-15.png?raw=true)
+- Term Frequency–Inverse Document Frequency (TF-IDF) for encoding.
+- Non-negative Matrix Factorization (NMF) for topic modeling and building recommendation system.
+>15 topics break-down
 
-#### Tools:
-Tools I intend to use:
+![](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender/blob/main/figures/list_of_topics.png?raw=true)
+
+>Recommendation system snapshot
+
+![](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender/blob/main/figures/app_snap_shot.png?raw=true)
+![](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender/blob/main/figures/app_snap_shot2.png?raw=true)
+
+
+## Tools
+---
 - Python
 - Pandas
 - Numpy
-- NLTK
+- Matplotlib
+- Plotly
 - Scikit-learn
-
-If time permitted, I would like to deploy my model using:
+- NLTK
+- Wordcloud
 - Streamlit
-- Heroku
 
-#### MVP:
-- Baseline sentiment analysis and topic modeling based on drinks' descriptions and reviews.
-- Recommend top 5 drinks based on the information users input.
+## Communication
+- All the notebooks can be found [HERE.](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender/tree/main/notebooks)
+- The recommendation app can be found [HERE.](https://share.streamlit.io/luongtruong77/nlp-drinks-cocktails-recommender/main/app/app.py)
+- The presentation can be found [HERE.](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender/blob/main/Presentation.pdf)
+
+
