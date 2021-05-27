@@ -45,11 +45,7 @@ topics_by_description_df = full_df.merge(topics_by_description_df, on='Descripti
 ########################################
 
 
-st.image(Image.open('figures/cocktails.jpg'))
 
-st.markdown("<h1 style='text-align: center; color: black;'>Your personal drinks recommendation system!</h1>",
-            unsafe_allow_html=True)
-st.write('---')
 
 ########################################
 
@@ -57,11 +53,38 @@ st.write('---')
 options = st.sidebar.selectbox('Please choose one of the options on how to search for your drinks.',
                                ('Please drink responsibly', 'Spirits, Wine, and Beer Recommendation',
                                 'Cocktails Recommendation'))
+st.sidebar.write('---')
+st.sidebar.write('This app was built by Steven Truong. Please reach out to me at [LinkedIn](https://www.linkedin.com/in/luongtruong77/)')
 
 if options == 'Please drink responsibly':
-    st.write("Please don't drink and drive!")
+
+    st.image(Image.open('figures/cocktails.jpg'))
+
+    st.markdown(
+        "<h1 style='text-align: center; color: black;'>Your personal drinks and cocktails recommendation system!</h1>",
+        unsafe_allow_html=True)
+
+    st.write('---')
+
+    st.markdown('This fun recommendation app was built using Natural Language Processing (NLP) with the data was acquired '
+             'from multiple sources: [Tastings.com](https://www.tastings.com/Reviews/Latest-Spirits-Wine-Beer-Reviews.aspx), '
+                '[CocktailDB](https://www.thecocktaildb.com/), [Liquor](https://www.liquor.com/cocktail-by-spirit-4779438), '
+                'and [Caskers](https://www.caskers.com/spirits/).', unsafe_allow_html=True)
+    st.write('The reviews, descriptions, and tasting information (wine and spirits), as well as ingredients (cocktails) '
+             'were encoded using *Term Frequency–Inverse Document Frequency (TF-IDF)* and used to build *Non-negative Matrix Factorization (NMF)*'
+             ' topic modeling. Upon the topics extracted from the model, the *cosine similarity metric* is used to compare'
+             ' users input information and return the most relevant products. Moreover, to recommend cocktails by name, '
+             'the *levenshtein distance metric* is used to correct the input names.')
+    st.write('Please choose how you want to be recommended on the left side bar.')
+    st.write('---')
+    st.write("**PLEASE DON'T DRINK AND DRIVE!**")
+    st.write('---')
+    st.write('\n')
+
 
 elif options == 'Spirits, Wine, and Beer Recommendation':
+
+    st.image(Image.open('figures/liquor.jpg'))
 
     choices = st.radio('Please choose how you want to be recommended by', ('By Description', 'By Tasting Info'))
 
@@ -78,6 +101,7 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
 
         if user_input == '':
             st.write('Please drink responsibly!')
+            st.write('My personal favorites are "scotch" and "whiskey"')
         else:
 
             topic_prob_dist = nmf.transform(tfidf.transform([user_input]))
@@ -175,6 +199,8 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
 
 elif options == 'Cocktails Recommendation':
 
+    st.image(Image.open('figures/cocktails2.jpg'))
+
     cocktails_options = st.radio('Please choose how you want to search:', ('By Name', 'By Ingredients'))
 
     if cocktails_options == 'By Name':
@@ -182,7 +208,7 @@ elif options == 'Cocktails Recommendation':
         user_input = st.text_input("case insensitive (gin and tonic, old-fashioned, etc.)")
 
         if user_input == '':
-            st.write('Cheers!')
+            st.write('My personal favorites are "Manhattan" and "old-fashioned"')
 
         else:
 
@@ -239,7 +265,7 @@ elif options == 'Cocktails Recommendation':
         user_input = st.text_input("what are your favorite ingredients? (gin, vodka, rum, etc.)")
 
         if user_input == '':
-            st.write('Cheers!')
+            st.write('My personal favorites are "scotch" and "whiskey"')
 
         else:
 
