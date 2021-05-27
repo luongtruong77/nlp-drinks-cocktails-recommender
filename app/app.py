@@ -43,27 +43,22 @@ topics_by_tasting_df = full_df.merge(topics_by_tasting_df, on='Name')
 topics_by_description_df = full_df.merge(topics_by_description_df, on='Description')
 
 ########################################
-
-
-
-
 ########################################
 
 
 options = st.sidebar.selectbox('Please choose one of the options on how to search for your drinks.',
-                               ('Please drink responsibly', 'Spirits, Wine, and Beer Recommendation',
+                               ('Home Page', 'Spirits, Wine, and Beer Recommendation',
                                 'Cocktails Recommendation'))
 st.sidebar.write('---')
-st.sidebar.write('This app was built by Steven Truong. Please reach out to me at [LinkedIn](https://www.linkedin.com/in/luongtruong77/)')
+st.sidebar.write('This app was built by Steven Truong. Please reach out to me at [LinkedIn](https://www.linkedin.com/in/luongtruong77/).'
+                 'The source codes on how to build this app can be found here [Github](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender)')
 
-if options == 'Please drink responsibly':
+if options == 'Home Page':
 
     st.image(Image.open('figures/cocktails.jpg'))
-
     st.markdown(
         "<h1 style='text-align: center; color: black;'>Your personal drinks and cocktails recommendation system!</h1>",
         unsafe_allow_html=True)
-
     st.write('---')
 
     st.markdown('This fun recommendation app was built using Natural Language Processing (NLP) with the data was acquired '
@@ -79,6 +74,7 @@ if options == 'Please drink responsibly':
     st.write('---')
     st.write("**PLEASE DON'T DRINK AND DRIVE!**")
     st.write('---')
+    st.image(Image.open('figures/pregnancy_warning.png'))
     st.write('\n')
 
 
@@ -97,7 +93,7 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
 
         st.write('What would you like to drink today?')
         user_input = st.text_input(
-            "Anything that you would like to describe your drink (cheap scotch, sweet wine, ipa, etc.)")
+            "Anything that you would like to describe your drink (scotch, spice rum, sweet wine, ipa, etc.)")
 
         if user_input == '':
             st.write('Please drink responsibly!')
@@ -105,12 +101,9 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
         else:
 
             topic_prob_dist = nmf.transform(tfidf.transform([user_input]))
-
             list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_matrix).argsort())[0][
                                         -1:-31:-1]
-
             top_items = topics_df.iloc[list_top_items_by_indices].sample(10)
-
 
             st.write('**The top results:**')
             st.write('\n')
@@ -128,7 +121,6 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
                 st.write('---')
 
             my_expander = st.beta_expander('Show more recommendations')
-
             with my_expander:
                 for i in range(3, 10):
                     st.write(
@@ -155,14 +147,10 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
         else:
 
             topic_prob_dist = nmf_tas.transform(tfidf_tas.transform([user_input]))
-
             list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_by_tasting_matrix).argsort())[0][
                                         -1:-21:-1]
-
             top_10_random_items = topics_by_tasting_df.iloc[list_top_items_by_indices].sample(10)
-
             top_items = top_10_random_items[:3]
-
             next_items = top_10_random_items[3:8]
 
             st.write('**The top results:**')
