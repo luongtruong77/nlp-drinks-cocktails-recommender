@@ -42,6 +42,8 @@ topics_by_tasting_df = full_df.merge(topics_by_tasting_df, on='Name')
 
 topics_by_description_df = full_df.merge(topics_by_description_df, on='Description')
 
+google_search_query = 'https://www.google.com/search?q='
+
 ########################################
 ########################################
 
@@ -108,11 +110,12 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
             st.write('**The top results:**')
             st.write('\n')
             for i in range(3):
+                google_search_query += "+".join(top_items.iloc[i].Name.split(" "))
                 st.write('**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
-                         '**Price:** ${}\n\n**Comments:** {}\n\n*{}*'.
+                         '**Price:** ${}\n\n**Comments:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
                          format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
                                 top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
-                                top_items.iloc[i].Bottom_Line, top_items.iloc[i].Review))
+                                top_items.iloc[i].Bottom_Line, google_search_query, top_items.iloc[i].Review))
                 try:
                     st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
                 except:
@@ -125,10 +128,10 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
                 for i in range(3, 10):
                     st.write(
                         '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
-                        '**Price:** ${}\n\n**Comments:** {}\n\n*{}*'.
+                        '**Price:** ${}\n\n**Comments:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
                             format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
                                    top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
-                                   top_items.iloc[i].Bottom_Line, top_items.iloc[i].Review))
+                                   top_items.iloc[i].Bottom_Line, google_search_query, top_items.iloc[i].Review))
                     try:
                         st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
                     except:
@@ -157,11 +160,12 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
             st.write('\n')
 
             for i in range(len(top_items)):
+                google_search_query += "+".join(top_items.iloc[i].Name.split(" "))
                 st.write('**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
-                         '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\n*{}*'.
+                         '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
                          format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
                                 top_items.iloc[i].Style, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
-                                top_items.iloc[i].Enjoy, top_items.iloc[i].Pairing, top_items.iloc[i].Review))
+                                top_items.iloc[i].Enjoy, top_items.iloc[i].Pairing, google_search_query, top_items.iloc[i].Review))
                 try:
                     st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=150)
                 except:
@@ -172,12 +176,13 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
 
             with my_expander:
                 for i in range(len(next_items)):
+                    google_search_query += "+".join(next_items.iloc[i].Name.split(" "))
                     st.write(
                         '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
-                        '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\n*{}*'.
+                        '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
                             format(next_items.iloc[i].Name, next_items.iloc[i].Country, next_items.iloc[i].Alcohol_Vol,
                                    next_items.iloc[i].Style, next_items.iloc[i].Flavor, next_items.iloc[i].Price,
-                                   next_items.iloc[i].Enjoy, next_items.iloc[i].Pairing, next_items.iloc[i].Review))
+                                   next_items.iloc[i].Enjoy, next_items.iloc[i].Pairing, google_search_query, next_items.iloc[i].Review))
                     try:
                         st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=150)
                     except:
