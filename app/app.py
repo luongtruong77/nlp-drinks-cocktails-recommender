@@ -120,12 +120,13 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
                     st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
                 except:
                     st.image(top_items.iloc[i].Photo_Link_2, width=200)
-
+                google_search_query = 'https://www.google.com/search?q='
                 st.write('---')
 
             my_expander = st.beta_expander('Show more recommendations')
             with my_expander:
                 for i in range(3, 10):
+                    google_search_query = 'https://www.google.com/search?q=' + "+".join(top_items.iloc[i].Name.split(" "))
                     st.write(
                         '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
                         '**Price:** ${}\n\n**Comments:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
@@ -136,6 +137,8 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
                         st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
                     except:
                         st.image(top_items.iloc[i].Photo_Link_2, width=200)
+
+                    google_search_query = 'https://www.google.com/search?q='
 
                     st.write('---')
 
@@ -160,7 +163,7 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
             st.write('\n')
 
             for i in range(len(top_items)):
-                google_search_query += "+".join(top_items.iloc[i].Name.split(" "))
+                google_search_query = 'https://www.google.com/search?q=' + "+".join(top_items.iloc[i].Name.split(" "))
                 st.write('**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
                          '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
                          format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
@@ -170,13 +173,14 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
                     st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=150)
                 except:
                     st.write('Image is not available!')
+                google_search_query = 'https://www.google.com/search?q='
                 st.write('---')
 
             my_expander = st.beta_expander('Show more recommendations')
 
             with my_expander:
                 for i in range(len(next_items)):
-                    google_search_query += "+".join(next_items.iloc[i].Name.split(" "))
+                    google_search_query = 'https://www.google.com/search?q=' + "+".join(next_items.iloc[i].Name.split(" "))
                     st.write(
                         '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
                         '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
@@ -187,6 +191,7 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
                         st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=150)
                     except:
                         st.write('Image is not available!')
+                    google_search_query = 'https://www.google.com/search?q='
 
                     st.write('---')
 
