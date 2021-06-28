@@ -44,94 +44,101 @@ topics_by_description_df = full_df.merge(topics_by_description_df, on='Descripti
 
 google_search_query = 'https://www.google.com/search?q='
 
+
 ########################################
 ########################################
 
-
-options = st.sidebar.selectbox('Please choose one of the options on how to search for your drinks.',
-                               ('Home Page', 'Spirits, Wine, and Beer Recommendation',
-                                'Cocktails Recommendation'))
-st.sidebar.write('---')
-st.sidebar.write(
-    'This app was built by Steven Truong. Please reach out to me at [LinkedIn](https://www.linkedin.com/in/luongtruong77/).'
-    'The source codes on how to build this app can be found here [Github](https://github.com/luongtruong77/nlp-drinks-cocktails-recommender)')
-
-if options == 'Home Page':
-
-    st.image(Image.open('figures/cocktails.jpg'))
-    st.markdown(
-        "<h1 style='text-align: center; color: black;'>Your personal drinks and cocktails recommendation system!</h1>",
-        unsafe_allow_html=True)
-    st.write('---')
-
-    st.markdown(
-        'This fun recommendation app was built using Natural Language Processing (NLP) with the data was acquired '
-        'from multiple sources: [Tastings.com](https://www.tastings.com/Reviews/Latest-Spirits-Wine-Beer-Reviews.aspx), '
-        '[CocktailDB](https://www.thecocktaildb.com/), [Liquor](https://www.liquor.com/cocktail-by-spirit-4779438), '
-        'and [Caskers](https://www.caskers.com/spirits/).', unsafe_allow_html=True)
-    st.write(
-        'The reviews, descriptions, and tasting information (wine and spirits), as well as ingredients (cocktails) '
-        'were encoded using *Term Frequency–Inverse Document Frequency (TF-IDF)* and used to build *Non-negative Matrix Factorization (NMF)*'
-        ' topic modeling. Upon the topics extracted from the model, the *cosine similarity metric* is used to compare'
-        ' users input information and return the most relevant products. Moreover, to recommend cocktails by name, '
-        'the *levenshtein distance metric* is used to correct the input names.')
-    st.write('Please choose how you want to be recommended on the left side bar.')
-    st.write('---')
-    st.write("**PLEASE DON'T DRINK AND DRIVE!**")
-    st.write('---')
-    st.image(Image.open('figures/pregnancy_warning.png'))
-    st.write('\n')
+def side_bar_info():
+    st.sidebar.title('About this page and its author')
+    st.sidebar.info('This visualization web app is created by Steven Truong, as part of his natural language processing'
+                    ' project '
+                    'during his time at [Metis](https://www.thisismetis.com/). Reach out to him on [LinkedIn]'
+                    '(https://www.linkedin.com/in/luongtruong77/) for connection or collaboration. Find out more about '
+                    'his other projects on [Github](https://github.com/luongtruong77).')
 
 
-elif options == 'Spirits, Wine, and Beer Recommendation':
+def main():
+    options = st.sidebar.selectbox('Please choose one of the options on how to search for your drinks.',
+                                   ('Home Page', 'Spirits, Wine, and Beer Recommendation',
+                                    'Cocktails Recommendation'))
 
-    st.image(Image.open('figures/liquor.jpg'))
+    if options == 'Home Page':
 
-    choices = st.radio('Please choose how you want to be recommended by', ('By Description', 'By Tasting Info'))
+        st.image(Image.open('figures/cocktails.jpg'))
+        st.markdown(
+            "<h1 style='text-align: center; color: black;'>Your personal drinks and cocktails recommendation system!</h1>",
+            unsafe_allow_html=True)
+        st.write('---')
 
-    if choices == 'By Description':
+        st.markdown(
+            'This fun recommendation app was built using Natural Language Processing (NLP) with the data was acquired '
+            'from multiple sources: [Tastings.com](https://www.tastings.com/Reviews/Latest-Spirits-Wine-Beer-Reviews.aspx), '
+            '[CocktailDB](https://www.thecocktaildb.com/), [Liquor](https://www.liquor.com/cocktail-by-spirit-4779438), '
+            'and [Caskers](https://www.caskers.com/spirits/).', unsafe_allow_html=True)
+        st.write(
+            'The reviews, descriptions, and tasting information (wine and spirits), as well as ingredients (cocktails) '
+            'were encoded using *Term Frequency–Inverse Document Frequency (TF-IDF)* and used to build *Non-negative Matrix Factorization (NMF)*'
+            ' topic modeling. Upon the topics extracted from the model, the *cosine similarity metric* is used to compare'
+            ' users input information and return the most relevant products. Moreover, to recommend cocktails by name, '
+            'the *levenshtein distance metric* is used to correct the input names.')
+        st.write('Please choose how you want to be recommended on the left side bar.')
 
-        nmf = nmf_des
-        tfidf = tfidf_des
-        topics_matrix = topics_by_description_matrix
-        topics_df = topics_by_description_df
+        #Icons
+        st.markdown("<div align='center'><br>"
+                    "<img src='https://img.shields.io/badge/PYTHON-blue?style=for-the-badge'"
+                    "alt='API stability' height='25'/>"
+                    "<img src='https://img.shields.io/badge/BEAUTIFULSOUP-green?style=for-the-badge'"
+                    "alt='API stability' height='25'/>"
+                    "<img src='https://img.shields.io/badge/plotly-blueviolet?style=for-the-badge'"
+                    "alt='API stability' height='25'/>"
+                    "<img src='https://img.shields.io/badge/STREAMLIT-red?style=for-the-badge'"
+                    "alt='API stability' height='25'/>"
+                    "<img src='https://img.shields.io/badge/JUPYTER-pink?style=for-the-badge'"
+                    "alt='API stability' height='25'/></div>", unsafe_allow_html=True)
+        st.write('---')
+        st.write("**PLEASE DON'T DRINK AND DRIVE!**")
+        st.write('---')
+        st.image(Image.open('figures/pregnancy_warning.png'))
+        st.write('\n')
 
-        st.write('What would you like to drink today?')
-        user_input = st.text_input(
-            "Anything that you would like to describe your drink (scotch, spice rum, sweet wine, ipa, etc.)")
 
-        if user_input == '':
-            st.write('Please drink responsibly!')
-            st.write('My personal favorites are "scotch" and "whiskey"')
-        else:
+    elif options == 'Spirits, Wine, and Beer Recommendation':
 
-            topic_prob_dist = nmf.transform(tfidf.transform([user_input]))
-            list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_matrix).argsort())[0][
-                                        -1:-31:-1]
-            top_items = topics_df.iloc[list_top_items_by_indices].sample(10)
+        st.image(Image.open('figures/liquor.jpg'))
 
-            st.write('**The top results:**')
-            st.write('\n')
-            for i in range(3):
+        st.sidebar.write('---')
+        st.sidebar.write('**By Description:** Type in anything that would describe your drinks, such as flavor, '
+                         'cheap/expensive, color, taste, etc.')
+        st.sidebar.write('**By Tasting Info:** Type in kind of food you would want to pair with, examples include '
+                         'chicken, fish, steak, etc.')
 
-                st.write(
-                    '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
-                    '**Price:** ${}\n\n**Comments:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
-                        format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
-                               top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
-                               top_items.iloc[i].Bottom_Line,
-                               google_search_query + "+".join(top_items.iloc[i].Name.split(" ")),
-                               top_items.iloc[i].Review))
-                try:
-                    st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
-                except:
-                    st.image(top_items.iloc[i].Photo_Link_2, width=200)
+        choices = st.radio('Please choose how you want to be recommended by', ('By Description', 'By Tasting Info'))
 
-                st.write('---')
+        if choices == 'By Description':
 
-            my_expander = st.beta_expander('Show more recommendations')
-            with my_expander:
-                for i in range(3, 10):
+            nmf = nmf_des
+            tfidf = tfidf_des
+            topics_matrix = topics_by_description_matrix
+            topics_df = topics_by_description_df
+
+            st.write('What would you like to drink today?')
+            user_input = st.text_input(
+                "Anything that you would like to describe your drink (scotch, spice rum, sweet wine, ipa, etc.)")
+
+            if user_input == '':
+                st.write('Please drink responsibly!')
+                st.write('My personal favorites are "scotch" and "whiskey"')
+            else:
+
+                topic_prob_dist = nmf.transform(tfidf.transform([user_input]))
+                list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_matrix).argsort())[0][
+                                            -1:-31:-1]
+                top_items = topics_df.iloc[list_top_items_by_indices].sample(10)
+
+                st.write('**The top results:**')
+                st.write('\n')
+                for i in range(3):
+
                     st.write(
                         '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
                         '**Price:** ${}\n\n**Comments:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
@@ -147,109 +154,119 @@ elif options == 'Spirits, Wine, and Beer Recommendation':
 
                     st.write('---')
 
-    elif choices == 'By Tasting Info':
+                my_expander = st.beta_expander('Show more recommendations')
+                with my_expander:
+                    for i in range(3, 10):
+                        st.write(
+                            '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Aroma:** {}\n\n**Flavor:** {}\n\n'
+                            '**Price:** ${}\n\n**Comments:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
+                                format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
+                                       top_items.iloc[i].Aroma, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
+                                       top_items.iloc[i].Bottom_Line,
+                                       google_search_query + "+".join(top_items.iloc[i].Name.split(" ")),
+                                       top_items.iloc[i].Review))
+                        try:
+                            st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=200)
+                        except:
+                            st.image(top_items.iloc[i].Photo_Link_2, width=200)
 
-        st.write('What kind of food are your pairing with?')
-        user_input = st.text_input("Anything that you would like to describe your food (steak, chicken, grilled, etc.)")
+                        st.write('---')
 
-        if user_input == '':
-            st.write('Please drink responsibly!')
+        elif choices == 'By Tasting Info':
 
-        else:
+            st.write('What kind of food are your pairing with?')
+            user_input = st.text_input(
+                "Anything that you would like to describe your food (steak, chicken, grilled, etc.)")
 
-            topic_prob_dist = nmf_tas.transform(tfidf_tas.transform([user_input]))
-            list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, topics_by_tasting_matrix).argsort())[0][
-                                        -1:-21:-1]
-            top_10_random_items = topics_by_tasting_df.iloc[list_top_items_by_indices].sample(10)
-            top_items = top_10_random_items[:3]
-            next_items = top_10_random_items[3:8]
+            if user_input == '':
+                st.write('Please drink responsibly!')
 
-            st.write('**The top results:**')
-            st.write('\n')
+            else:
 
-            for i in range(len(top_items)):
-                st.write(
-                    '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
-                    '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
-                        format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
-                               top_items.iloc[i].Style, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
-                               top_items.iloc[i].Enjoy, top_items.iloc[i].Pairing,
-                               google_search_query + "+".join(top_items.iloc[i].Name.split(" ")),
-                               top_items.iloc[i].Review))
-                try:
-                    st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=150)
-                except:
-                    st.write('Image is not available!')
-                st.write('---')
+                topic_prob_dist = nmf_tas.transform(tfidf_tas.transform([user_input]))
+                list_top_items_by_indices = \
+                    list(cosine_similarity(topic_prob_dist, topics_by_tasting_matrix).argsort())[0][
+                    -1:-21:-1]
+                top_10_random_items = topics_by_tasting_df.iloc[list_top_items_by_indices].sample(10)
+                top_items = top_10_random_items[:3]
+                next_items = top_10_random_items[3:8]
 
-            my_expander = st.beta_expander('Show more recommendations')
+                st.write('**The top results:**')
+                st.write('\n')
 
-            with my_expander:
-                for i in range(len(next_items)):
+                for i in range(len(top_items)):
                     st.write(
                         '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
                         '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
-                            format(next_items.iloc[i].Name, next_items.iloc[i].Country, next_items.iloc[i].Alcohol_Vol,
-                                   next_items.iloc[i].Style, next_items.iloc[i].Flavor, next_items.iloc[i].Price,
-                                   next_items.iloc[i].Enjoy, next_items.iloc[i].Pairing,
-                                   google_search_query + "+".join(next_items.iloc[i].Name.split(" ")),
-                                   next_items.iloc[i].Review))
+                            format(top_items.iloc[i].Name, top_items.iloc[i].Country, top_items.iloc[i].Alcohol_Vol,
+                                   top_items.iloc[i].Style, top_items.iloc[i].Flavor, top_items.iloc[i].Price,
+                                   top_items.iloc[i].Enjoy, top_items.iloc[i].Pairing,
+                                   google_search_query + "+".join(top_items.iloc[i].Name.split(" ")),
+                                   top_items.iloc[i].Review))
                     try:
-                        st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=150)
+                        st.image([top_items.iloc[i].Photo_Link_2, top_items.iloc[i].Photo_Link], width=150)
                     except:
                         st.write('Image is not available!')
-
                     st.write('---')
 
-elif options == 'Cocktails Recommendation':
+                my_expander = st.beta_expander('Show more recommendations')
 
-    st.image(Image.open('figures/cocktails2.jpg'))
+                with my_expander:
+                    for i in range(len(next_items)):
+                        st.write(
+                            '**Name:** {}\n\n**Country:** {}\n\n**Alcohol Volume:** {}\n\n**Style:** {}\n\n**Flavor:** {}\n\n'
+                            '**Price:** ${}\n\n**Enjoy:** {}\n\n**Pairing:** {}\n\nFind where to buy this product near you. Click [HERE!]({})\n\n*{}*'.
+                                format(next_items.iloc[i].Name, next_items.iloc[i].Country,
+                                       next_items.iloc[i].Alcohol_Vol,
+                                       next_items.iloc[i].Style, next_items.iloc[i].Flavor, next_items.iloc[i].Price,
+                                       next_items.iloc[i].Enjoy, next_items.iloc[i].Pairing,
+                                       google_search_query + "+".join(next_items.iloc[i].Name.split(" ")),
+                                       next_items.iloc[i].Review))
+                        try:
+                            st.image([next_items.iloc[i].Photo_Link_2, next_items.iloc[i].Photo_Link], width=150)
+                        except:
+                            st.write('Image is not available!')
 
-    cocktails_options = st.radio('Please choose how you want to search:', ('By Name', 'By Ingredients'))
+                        st.write('---')
 
-    if cocktails_options == 'By Name':
+    elif options == 'Cocktails Recommendation':
 
-        user_input = st.text_input("case insensitive (gin and tonic, old-fashioned, etc.)")
+        st.image(Image.open('figures/cocktails2.jpg'))
 
-        if user_input == '':
-            st.write('My personal favorites are "Manhattan" and "old-fashioned"')
+        st.sidebar.write('---')
+        st.sidebar.write('**By Name:** Type in the name of the cocktails you would want to search for. For examples: '
+                         'manhattan, old fashioned, sangria')
+        st.sidebar.write('**By Ingredients:** Type in the alcoholic/non-alcoholic ingredients that you would want '
+                         'you cocktails have. For examples: sugar, lime, vodka, whiskey, etc.')
 
-        else:
+        cocktails_options = st.radio('Please choose how you want to search:', ('By Name', 'By Ingredients'))
 
-            n = len(user_input)
+        if cocktails_options == 'By Name':
 
-            distances = []
+            user_input = st.text_input("case insensitive (gin and tonic, old-fashioned, etc.)")
 
-            for i in range(len(cocktails_with_photos)):
-                dist = edit_distance(user_input.lower(), cocktails_with_photos.Name.iloc[i].strip().lower()[:n])
+            if user_input == '':
+                st.write('My personal favorites are "Manhattan" and "old-fashioned"')
 
-                distances.append(dist)
+            else:
 
-            cocktails_with_photos['Distance'] = pd.DataFrame(distances, columns={'Distance'}).Distance
+                n = len(user_input)
 
-            top_items = cocktails_with_photos.sort_values(by='Distance').head(10).fillna('N/A')
+                distances = []
 
-            st.write('**The top results:**')
-            st.write('\n')
+                for i in range(len(cocktails_with_photos)):
+                    dist = edit_distance(user_input.lower(), cocktails_with_photos.Name.iloc[i].strip().lower()[:n])
 
-            for i in range(3):
+                    distances.append(dist)
 
-                st.write(
-                    '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                        .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
-                                top_items.iloc[i].Instructions,
-                                top_items.iloc[i].Serve_In))
-                try:
-                    st.image(top_items.iloc[i].Photo_Link, width=250)
-                except:
-                    st.write('Image is not available!')
+                cocktails_with_photos['Distance'] = pd.DataFrame(distances, columns={'Distance'}).Distance
 
-                st.write('---')
+                top_items = cocktails_with_photos.sort_values(by='Distance').head(10).fillna('N/A')
 
-            my_expander = st.beta_expander('Show more recommendations')
+                st.write('**The top results:**')
+                st.write('\n')
 
-            with my_expander:
-                for i in range(3, 10):
+                for i in range(3):
 
                     st.write(
                         '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
@@ -263,44 +280,45 @@ elif options == 'Cocktails Recommendation':
 
                     st.write('---')
 
+                my_expander = st.beta_expander('Show more recommendations')
 
-    elif cocktails_options == 'By Ingredients':
+                with my_expander:
+                    for i in range(3, 10):
 
-        user_input = st.text_input("what are your favorite ingredients? (gin, vodka, rum, etc.)")
+                        st.write(
+                            '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                                .format(top_items.iloc[i].Name, top_items.iloc[i].Category,
+                                        top_items.iloc[i].Ingredients,
+                                        top_items.iloc[i].Instructions,
+                                        top_items.iloc[i].Serve_In))
+                        try:
+                            st.image(top_items.iloc[i].Photo_Link, width=250)
+                        except:
+                            st.write('Image is not available!')
 
-        if user_input == '':
-            st.write('My personal favorites are "scotch" and "whiskey"')
+                        st.write('---')
 
-        else:
 
-            topic_prob_dist = nmf_ingredients.transform(tfidf_ingredients.transform([user_input]))
+        elif cocktails_options == 'By Ingredients':
 
-            list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, ingredients_matrix).argsort())[0][
-                                        -1:-21:-1]
+            user_input = st.text_input("what are your favorite ingredients? (gin, vodka, rum, etc.)")
 
-            top_items = cocktails_with_photos.iloc[list_top_items_by_indices].sample(10)
+            if user_input == '':
+                st.write('My personal favorites are "scotch" and "whiskey"')
 
-            st.write('**The top results:**')
-            st.write('\n')
+            else:
 
-            for i in range(3):
+                topic_prob_dist = nmf_ingredients.transform(tfidf_ingredients.transform([user_input]))
 
-                st.write(
-                    '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
-                        .format(top_items.iloc[i].Name, top_items.iloc[i].Category, top_items.iloc[i].Ingredients,
-                                top_items.iloc[i].Instructions,
-                                top_items.iloc[i].Serve_In))
-                try:
-                    st.image(top_items.iloc[i].Photo_Link, width=250)
-                except:
-                    st.write('Image is not available!')
+                list_top_items_by_indices = list(cosine_similarity(topic_prob_dist, ingredients_matrix).argsort())[0][
+                                            -1:-21:-1]
 
-                st.write('---')
+                top_items = cocktails_with_photos.iloc[list_top_items_by_indices].sample(10)
 
-            my_expander = st.beta_expander('Show more recommendations')
+                st.write('**The top results:**')
+                st.write('\n')
 
-            with my_expander:
-                for i in range(3, 10):
+                for i in range(3):
 
                     st.write(
                         '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
@@ -313,3 +331,27 @@ elif options == 'Cocktails Recommendation':
                         st.write('Image is not available!')
 
                     st.write('---')
+
+                my_expander = st.beta_expander('Show more recommendations')
+
+                with my_expander:
+                    for i in range(3, 10):
+
+                        st.write(
+                            '**Name:** {}\n\n**Category:** {}\n\n**Ingredients:** {}\n\n**Instructions:** {}\n\n**Serve in:** {}'
+                                .format(top_items.iloc[i].Name, top_items.iloc[i].Category,
+                                        top_items.iloc[i].Ingredients,
+                                        top_items.iloc[i].Instructions,
+                                        top_items.iloc[i].Serve_In))
+                        try:
+                            st.image(top_items.iloc[i].Photo_Link, width=250)
+                        except:
+                            st.write('Image is not available!')
+
+                        st.write('---')
+
+    side_bar_info()
+
+
+if __name__ == "__main__":
+    main()

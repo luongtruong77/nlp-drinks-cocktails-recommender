@@ -9,6 +9,7 @@ __pycache__/
 .Python
 .ipynb_checkpoints
 *.csv
+*.pptx
 data/
 env/
 build/
